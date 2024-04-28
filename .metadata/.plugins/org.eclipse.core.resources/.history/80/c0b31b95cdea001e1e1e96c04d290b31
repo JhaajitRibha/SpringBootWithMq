@@ -1,0 +1,39 @@
+package com.ajit.active.mq.application.service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ConsumerService {
+	
+	@Autowired
+	private JmsTemplate jmsTemplate;
+	
+	
+	@Scheduled(cron="0 0 11 * * ?")
+	public void consumeScheduledMessage() {
+		System.out.println("consuming message program triggered at :" + LocalDate.now() );
+	    listener();
+	}
+	
+	
+	@JmsListener(destination="queue")
+	public void listener() {
+		
+		String message = (String) jmsTemplate.receiveAndConvert("queue");
+		message = "name received from queue :" + message;
+		
+		if(message!=null) {
+
+			System.out.println(message +
+					"at " + LocalDateTime.now());
+			}
+	}
+
+}

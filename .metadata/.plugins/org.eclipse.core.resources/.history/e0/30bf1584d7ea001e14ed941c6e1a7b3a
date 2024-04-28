@@ -1,0 +1,49 @@
+package com.ajit.active.mq.application.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+public class ConsumerService {
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
+    // Scheduled task to consume messages every 2 minutes
+    @Scheduled(cron = "0 */2 * * * *")
+    public void consumeScheduledMessage() {
+        System.out.println("Consuming messages from the queue at: " + LocalDateTime.now());
+        listenAndConsume();
+    }
+
+    // JMS Listener for consuming messages from the queue
+    @JmsListener(destination = "queue")
+    public void listenAndConsume() {
+        System.out.println("Listening for messages from the queue...");
+
+        // Loop to keep consuming messages until the queue is empty
+        while (true) {
+            // Receive a message from the queue
+            String message = (String) jmsTemplate.receiveAndConvert("queue");
+
+            // Break the loop if no message is received
+            if (message == null) {
+                break;
+            }
+
+            // Process the received message
+            processMessage(message);
+        }
+    }
+
+    // Process the received message
+    private void processMessage(String message) {
+        // You can implement your message processing logic here
+        System.out.println("Message received from queue: " + message + " at " + LocalDateTime.now());
+    }
+}

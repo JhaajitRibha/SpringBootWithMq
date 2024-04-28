@@ -1,0 +1,59 @@
+package com.ajit.active.mq.application.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class ConsumerService {
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
+    private List<String> messageBuffer = new ArrayList<>();
+
+   
+    @Scheduled(fixedRate = 120000)
+    public void consumeScheduledMessage() {
+        System.out.println("Consuming messages from the queues at: " + LocalDateTime.now());
+        processBufferedMessages();
+    }
+
+    
+    @JmsListener(destination = "queue")
+    public void receiveFromQueue1(String message) {
+        System.out.println("Received message from queue: " + message + " at " + LocalDateTime.now());
+        messageBuffer.add(message);
+    }
+
+   
+    @JmsListener(destination = "queueTwo")
+    public void receiveFromQueue2(String message) {
+        System.out.println("Received message from queueTwo: " + message + " at " + LocalDateTime.now());
+        messageBuffer.add(message);
+    }
+
+    private void processBufferedMessages() {
+        if (!messageBuffer.isEmpty()) {
+            System.out.println("Processing buffered messages...");
+            for (String message : messageBuffer) {
+                processMessage(message);
+            }
+            messageBuffer.clear(); // Clear the buffer after processing
+        } else {
+            System.out.println("No messages in the buffer.");
+        }
+    }
+
+    // Process the received message
+    private void processMessage(String message) {
+        // You can implement your message processing logic here
+        System.out.println("Message processed: " + message + " at " + LocalDateTime.now());
+    }
+}

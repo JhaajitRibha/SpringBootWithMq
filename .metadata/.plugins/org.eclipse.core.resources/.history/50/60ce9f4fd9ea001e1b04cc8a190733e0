@@ -1,0 +1,47 @@
+package com.ajit.active.mq.application.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+public class ConsumerService {
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
+    
+    @Scheduled(cron = "0 */2 * * * *")
+    public void consumeScheduledMessage() {
+        System.out.println("Consuming messages from the queue at: " + LocalDateTime.now());
+        listenAndConsume();
+    }
+
+   
+    @JmsListener(destination = "queueTwo")
+    public void listenAndConsume() {
+        System.out.println("Listening for messages from the queue...");
+
+        
+        while (true) {
+            
+            String message = (String) jmsTemplate.receiveAndConvert("queueTwo");
+
+            if (message == null) {
+                break;
+            }
+
+            processMessage(message);
+        }
+    }
+
+   
+    private void processMessage(String message) {
+       
+        System.out.println("Message received from queue: " + message + " at " + LocalDateTime.now());
+    }
+}

@@ -1,0 +1,5 @@
+package com.ajit.active.mq.application.controller;
+
+public class SendController {
+
+}

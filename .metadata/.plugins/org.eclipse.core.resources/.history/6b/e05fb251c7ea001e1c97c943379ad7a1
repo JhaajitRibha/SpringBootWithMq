@@ -1,0 +1,5 @@
+package com.ajit.active.mq.application.Service;
+
+public class SendService {
+
+}

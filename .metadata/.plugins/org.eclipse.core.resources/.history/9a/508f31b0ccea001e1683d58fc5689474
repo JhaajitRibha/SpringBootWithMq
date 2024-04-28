@@ -1,0 +1,14 @@
+package com.ajit.active.mq.application.service;
+
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ConsumerService {
+	
+	@JmsListener(destination="queue")
+	public void listener(String name) {
+		System.out.println("name received from application queue : " + name);
+	}
+
+}
